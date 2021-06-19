@@ -339,7 +339,7 @@ def purchase():
         for pr in prid_in_cart:
             
             history.append(pr)
-        #users.update_one({'email': uuid_email}, { '$set': {'cart': []} }, True)  # Empty the cart
+        users.update_one({'email': uuid_email}, { '$set': {'cart': []} }, True)  # Empty the cart
         print(history)
 
         users.update_one({'email': uuid_email}, { '$set': {'orderHistory': history} }, True)  # Write order History
