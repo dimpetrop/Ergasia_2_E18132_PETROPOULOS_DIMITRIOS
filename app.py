@@ -70,6 +70,7 @@ def create_user():
     
 
 # Logging in user
+# Logging in user
 @app.route('/login', methods=['POST'])
 def login():
     # Request JSON data
@@ -89,7 +90,7 @@ def login():
     if users.find_one({"email":data["email"]}) == None:
         return Response("Wrong email or password.", status=400, mimetype='application/json')
     else:
-        if users.find_one({"password": {"$eq": data["password"]}}):
+        if users.find_one({"email": data["email"],"password": {"$eq": data["password"]}}):
             user_uuid = create_session(data["email"])
             res = {"uuid": user_uuid, "email": data['email']}
 
