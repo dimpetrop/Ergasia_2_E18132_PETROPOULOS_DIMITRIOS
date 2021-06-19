@@ -109,9 +109,9 @@ def search_product():
     if data == None:
         return Response("bad request",status=500,mimetype='application/json')
 
-    # # # Check if user is verified
-    # if not is_session_valid(request.headers.get("uuid")):
-    #     return Response("User is not verified, please login first", status=401, mimetype='application/json')
+    # # Check if user is verified
+    if not is_session_valid(request.headers.get("uuid")):
+        return Response("User is not verified, please login first", status=401, mimetype='application/json')
     
     #Check against name - this has the highest priority!
     if "name" in data:
@@ -292,16 +292,15 @@ def purchase():
         return Response("Information incomplete - card number is incorrect",status=500,mimetype="application/json")
 
     # # Check if user is verified
-    # if not is_session_valid(request.headers.get("uuid")):
-    #     return Response("User is not verified, please login first", status=401, mimetype='application/json')
+    if not is_session_valid(request.headers.get("uuid")):
+        return Response("User is not verified, please login first", status=401, mimetype='application/json')
 
-    # # Check if user is not an admin via the user_sessions dictionary
-    # uuid_email = users_sessions[request.headers.get("uuid")][0] # user_sessions is of format user_sessions["278-12ffd-df-34"] = [test@example.com, time]
+    # Check if user is not an admin via the user_sessions dictionary
+    uuid_email = users_sessions[request.headers.get("uuid")][0] # user_sessions is of format user_sessions["278-12ffd-df-34"] = [test@example.com, time]
 
-    # if not users.find_one({"email":uuid_email, "category":"user"}):
-    #     return Response("Admins can not purchase", status=400, mimetype='application/json')
+    if not users.find_one({"email":uuid_email, "category":"user"}):
+        return Response("Admins can not purchase", status=400, mimetype='application/json')
 
-    uuid_email = "test@example.com"
     user = users.find_one({"email":uuid_email, "cart": {"$exists": True}})  #Checking if user has a cart
 
     prid_in_cart = [] # Product IDs in Cart
@@ -333,8 +332,17 @@ def purchase():
         for price in product_full:
             total += float(price[1][len("Price:"):len(price[1])])  # product_full is multidimensional and includes string so convert to float from "price:" and after
         
-        users.update_one({'email': uuid_email}, { '$set': {'cart': []} }, True)  # Empty the cart
-        users.update_one({'email': uuid_email}, { '$set': {'orderHistory': prid_in_cart} }, True)  # Write order History
+        history = []
+        for pr in user["orderHistory"]:
+            history.append(pr)
+        
+        for pr in prid_in_cart:
+            
+            history.append(pr)
+        #users.update_one({'email': uuid_email}, { '$set': {'cart': []} }, True)  # Empty the cart
+        print(history)
+
+        users.update_one({'email': uuid_email}, { '$set': {'orderHistory': history} }, True)  # Write order History
 
         
 
