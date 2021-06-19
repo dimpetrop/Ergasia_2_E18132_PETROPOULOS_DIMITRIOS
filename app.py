@@ -333,12 +333,12 @@ def purchase():
             total += float(price[1][len("Price:"):len(price[1])])  # product_full is multidimensional and includes string so convert to float from "price:" and after
         
         history = []
-        for pr in user["orderHistory"]:
-            history.append(pr)
+        for pr in user["orderHistory"]:   # Interate through the orderHistory ids
+            history.append(pr) #add them to history array
         
-        for pr in prid_in_cart:
-            
+        for pr in prid_in_cart: #append all ids from cart to history array
             history.append(pr)
+
         users.update_one({'email': uuid_email}, { '$set': {'cart': []} }, True)  # Empty the cart
         print(history)
 
